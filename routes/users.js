@@ -7,7 +7,6 @@ router.get('/', function(req, res, next) {
 });
 
 //Challenge
-
 router.get('/cool/', function(req, res, next) {
   res.render('cool', { title: 'Challenge', message: 'You\'re so cool' });
 });
