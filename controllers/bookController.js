@@ -6,7 +6,6 @@ const BookInstance = require("../models/bookinstance");
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
-  // Get details of books, book instances, authors and genre counts (in parallel)
   const [
     numBooks,
     numBookInstances,
@@ -32,12 +31,29 @@ exports.index = asyncHandler(async (req, res, next) => {
 });
 
 exports.book_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Book list");
+  const allBooks = await Book.find({}, "title author")
+    .sort({ "title": 1 })
+    .populate("author")
+    .exec()
+
+  res.render("book_list", { title: "Book List", book_list: allBooks })
 });
 
 exports.book_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`);
+  const [ book, bookInstances ] = await Promise.all(Array(
+    Book.findById(req.params.id).populate("author").populate("genre").exec(),
+    BookInstance.find({ book: req.params.id }).exec()
+  ))
+
+  if (book === null) {
+    const err = new Error("Book not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("book_detail", { title: book.title, book: book, book_instances: bookInstances })
 });
+
 
 exports.book_create_get = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: Book create GET");
