@@ -3,7 +3,9 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const dotenv = require('dotenv').config().parsed;
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -17,7 +19,7 @@ const app = express();
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
-const mongoDB = `mongodb+srv://${dotenv.DBUSER}:${dotenv.DBPASSWORD}@cluster0.zp8czot.mongodb.net/local_library?retryWrites=true&w=majority`
+const mongoDB = `mongodb+srv://${process.env.DBUSER}:${process.env.DBPASSWORD}@cluster0.zp8czot.mongodb.net/local_library?retryWrites=true&w=majority`
   || "mongodb+srv://your_user_name:your_password@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority";
 
 main().catch((err) => console.log(err));
