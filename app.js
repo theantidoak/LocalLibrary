@@ -9,16 +9,37 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
 
+const compression = require("compression");
+const helmet = require("helmet");
+
 const app = express();
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const mongoDB = `mongodb+srv://${dotenv.DBUSER}:${dotenv.DBPASSWORD}@cluster0.zp8czot.mongodb.net/local_library?retryWrites=true&w=majority`;
+
+const mongoDB = `mongodb+srv://${dotenv.DBUSER}:${dotenv.DBPASSWORD}@cluster0.zp8czot.mongodb.net/local_library?retryWrites=true&w=majority`
+  || "mongodb+srv://your_user_name:your_password@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority";
 
 main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
 }
+
+app.use(compression());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  }),
+);
+
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+app.use(limiter);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
