@@ -69,9 +69,7 @@ exports.genre_delete_get = asyncHandler(async (req, res, next) => {
   ]);
   
   if (genre === null) {
-    const err = new Error("Genre not found");
-    err.status = 404;
-    return next(err);
+    res.redirect('/catalog/genres')
   }
 
   res.render("genre_delete", {
@@ -87,7 +85,7 @@ exports.genre_delete_post = asyncHandler(async (req, res, next) => {
     Book.find({ genre: req.params.id }, "title summary").exec(),
   ]);
 
-  if (booksInGenre > 0) {
+  if (booksInGenre.length > 0) {
     res.render("genre_delete", {
       title: "Delete Genre",
       genre: genre,
